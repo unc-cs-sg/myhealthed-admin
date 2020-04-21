@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import {
@@ -7,9 +6,11 @@ import {
     NavLink
 } from './../../components';
 
+import { signOut } from '../../firebase/firebase';
+
 const NavbarUser = (props) => (
-    <NavItem { ...props }>
-        <NavLink tag={ Link } to="/pages/login">
+    <NavItem {...props}>
+        <NavLink onClick={ signOut }>
             <i className="fa fa-power-off"></i>
         </NavLink>
     </NavItem>

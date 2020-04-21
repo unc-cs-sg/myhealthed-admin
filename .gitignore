@@ -4,6 +4,7 @@ dist
 # project-specific secret keys and sensitive data
 /backend/config/secrets.js
 /backend/data
+app/firebase/config.js
 
 # dependencies
 node_modules

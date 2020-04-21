@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
     Route,
     Switch,
@@ -56,6 +56,7 @@ import Tables from './Tables/Tables';
 import ExtendedTable from './Tables/ExtendedTable';
 import AgGrid from './Tables/AgGrid';
 
+import UserApproval from './Pages/UserApproval';
 import ComingSoon from './Pages/ComingSoon';
 import Confirmation from './Pages/Confirmation';
 import Danger from './Pages/Danger';
@@ -68,6 +69,8 @@ import Success from './Pages/Success';
 import Timeline from './Pages/Timeline';
 
 import Icons from './Icons';
+import { UserContext } from '../providers/UserProvider';
+import { db } from '../firebase/firebase';
 
 // ----------- Layout Imports ---------------
 import { DefaultNavbar } from './../layout/components/DefaultNavbar';
@@ -75,10 +78,27 @@ import { DefaultSidebar } from './../layout/components/DefaultSidebar';
 
 import { SidebarANavbar } from './../layout/components/SidebarANavbar';
 import { SidebarASidebar } from './../layout/components/SidebarASidebar';
+import { PageLoader } from './../components/index'
 
 //------ Route Definitions --------
 // eslint-disable-next-line no-unused-vars
 export const RoutedContent = () => {
+    const [currentUserType, setCurrentUserType] = useState('');
+
+    useEffect(() => {
+        if (!currentUserType) {
+            getCurrentUserType();
+        }
+    }, []);
+
+    const currentUser = useContext(UserContext);
+
+    const getCurrentUserType = async () => {
+        let currentUserDoc = await db.collection('users').doc(currentUser.uid).get();
+        currentUserDoc = currentUserDoc.data();
+        setCurrentUserType(currentUserDoc['type']);
+    };
+
     return (
         <Switch>
             <Route path="/demo" component={APIDemo} />
@@ -106,77 +126,84 @@ export const RoutedContent = () => {
             <Route path="/layouts/sidebar-with-navbar" component={SidebarWithNavbar} />
             <Route path='/layouts/dnd-layout' component={DragAndDropLayout} />
 
-            { /*    Interface Routes   */ }
-            <Route component={ Accordions } path="/interface/accordions" />
-            <Route component={ Alerts } path="/interface/alerts" />
-            <Route component={ Avatars } path="/interface/avatars" />
-            <Route component={ BadgesLabels } path="/interface/badges-and-labels" />
-            <Route component={ Breadcrumbs } path="/interface/breadcrumbs" />
-            <Route component={ Buttons } path="/interface/buttons" />
-            <Route component={ Colors } path="/interface/colors" />
-            <Route component={ Dropdowns } path="/interface/dropdowns" />
-            <Route component={ Images } path="/interface/images" />
-            <Route component={ ListGroups } path="/interface/list-groups" />
-            <Route component={ MediaObjects } path="/interface/media-objects" />
-            <Route component={ Modals } path="/interface/modals" />
-            <Route component={ Navbars } path="/interface/navbars" />
-            <Route component={ Paginations } path="/interface/paginations" />
-            <Route component={ ProgressBars } path="/interface/progress-bars" />
-            <Route component={ TabsPills } path="/interface/tabs-pills" />
-            <Route component={ TooltipPopovers } path="/interface/tooltips-and-popovers" />
-            <Route component={ Typography } path="/interface/typography" />
-            <Route component={ Notifications } path="/interface/notifications" />
-            <Route component={ CropImage } path="/interface/crop-image" />
-            <Route component={ DragAndDropElements } path="/interface/drag-and-drop-elements" />
-            <Route component={ Calendar } path="/interface/calendar" />
+            { /*    Interface Routes   */}
+            <Route component={Accordions} path="/interface/accordions" />
+            <Route component={Alerts} path="/interface/alerts" />
+            <Route component={Avatars} path="/interface/avatars" />
+            <Route component={BadgesLabels} path="/interface/badges-and-labels" />
+            <Route component={Breadcrumbs} path="/interface/breadcrumbs" />
+            <Route component={Buttons} path="/interface/buttons" />
+            <Route component={Colors} path="/interface/colors" />
+            <Route component={Dropdowns} path="/interface/dropdowns" />
+            <Route component={Images} path="/interface/images" />
+            <Route component={ListGroups} path="/interface/list-groups" />
+            <Route component={MediaObjects} path="/interface/media-objects" />
+            <Route component={Modals} path="/interface/modals" />
+            <Route component={Navbars} path="/interface/navbars" />
+            <Route component={Paginations} path="/interface/paginations" />
+            <Route component={ProgressBars} path="/interface/progress-bars" />
+            <Route component={TabsPills} path="/interface/tabs-pills" />
+            <Route component={TooltipPopovers} path="/interface/tooltips-and-popovers" />
+            <Route component={Typography} path="/interface/typography" />
+            <Route component={Notifications} path="/interface/notifications" />
+            <Route component={CropImage} path="/interface/crop-image" />
+            <Route component={DragAndDropElements} path="/interface/drag-and-drop-elements" />
+            <Route component={Calendar} path="/interface/calendar" />
 
-            { /*    Graphs Routes   */ }
-            <Route component={ ReCharts } path="/graphs/re-charts" />
+            { /*    Graphs Routes   */}
+            <Route component={ReCharts} path="/graphs/re-charts" />
 
-            { /*    Tables Routes   */ }
-            <Route component={ Tables } path="/tables/tables" />
-            <Route component={ ExtendedTable } path="/tables/extended-table" />
-            <Route component={ AgGrid } path="/tables/ag-grid" />
+            { /*    Tables Routes   */}
+            <Route component={Tables} path="/tables/tables" />
+            <Route component={ExtendedTable} path="/tables/extended-table" />
+            <Route component={AgGrid} path="/tables/ag-grid" />
 
-            { /*    Pages Routes    */ }
-            <Route component={ ComingSoon } path="/pages/coming-soon" />
-            <Route component={ Confirmation } path="/pages/confirmation" />
-            <Route component={ Danger } path="/pages/danger" />
-            <Route component={ Error404 } path="/pages/error-404" />
-            <Route component={ ForgotPassword } path="/pages/forgot-password" />
-            <Route component={ LockScreen } path="/pages/lock-screen" />
-            <Route component={ Login } path="/pages/login" />
-            <Route component={ Register } path="/pages/register" />
-            <Route component={ Success } path="/pages/success" />
-            <Route component={ Timeline } path="/pages/timeline" />
+            { /*    Pages Routes    */}
+            <Route path="/pages/user-approval">
+                <React.Suspense fallback={<PageLoader />}>
+                    {currentUserType == 'admin' ?
+                        <UserApproval /> :
+                        <Error404 />}
+                </React.Suspense>
+            </Route>
+            <Route component={ComingSoon} path="/pages/coming-soon" />
+            <Route component={Confirmation} path="/pages/confirmation" />
+            <Route component={Danger} path="/pages/danger" />
+            <Route component={Error404} path="/pages/error-404" />
+            <Route component={ForgotPassword} path="/pages/forgot-password" />
+            <Route component={LockScreen} path="/pages/lock-screen" />
+            <Route component={Login} path="/pages/login" />
+            <Route component={Register} path="/pages/register" />
+            <Route component={Success} path="/pages/success" />
+            <Route component={Timeline} path="/pages/timeline" />
 
             <Route path='/icons' exact component={Icons} />
 
-            { /*    404    */ }
+            { /*    404    */}
             <Redirect to="/pages/error-404" />
         </Switch>
     );
 };
 
 //------ Custom Layout Parts --------
-export const RoutedNavbars  = () => (
+export const RoutedNavbars = () => (
     <Switch>
         { /* Other Navbars: */}
         <Route
-            component={ SidebarANavbar }
+            component={SidebarANavbar}
             path="/layouts/sidebar-a"
         />
         <Route
-            component={ NavbarOnly.Navbar }
+            component={NavbarOnly.Navbar}
             path="/layouts/navbar"
         />
         <Route
-            component={ SidebarWithNavbar.Navbar }
+            component={SidebarWithNavbar.Navbar}
             path="/layouts/sidebar-with-navbar"
         />
         { /* Default Navbar: */}
         <Route
-            component={ DefaultNavbar }
+            component={DefaultNavbar}
         />
     </Switch>
 );
@@ -185,16 +212,16 @@ export const RoutedSidebars = () => (
     <Switch>
         { /* Other Sidebars: */}
         <Route
-            component={ SidebarASidebar }
+            component={SidebarASidebar}
             path="/layouts/sidebar-a"
         />
         <Route
-            component={ SidebarWithNavbar.Sidebar }
+            component={SidebarWithNavbar.Sidebar}
             path="/layouts/sidebar-with-navbar"
         />
         { /* Default Sidebar: */}
         <Route
-            component={ DefaultSidebar }
+            component={DefaultSidebar}
         />
     </Switch>
 );

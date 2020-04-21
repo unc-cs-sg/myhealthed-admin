@@ -15,6 +15,7 @@ import {
 
 import { HeaderAuth } from "../../components/Pages/HeaderAuth";
 import { FooterAuth } from "../../components/Pages/FooterAuth";
+import { signInWithGoogle } from '../../../firebase/firebase.js';
 
 const Login = () => (
     <EmptyLayout>
@@ -47,7 +48,7 @@ const Login = () => (
                 <ThemeConsumer>
                 {
                     ({ color }) => (
-                        <Button color={ color } block tag={ Link } to="/">
+                        <Button color={ color } onClick={signInWithGoogle}>
                             Sign In
                         </Button>
                     )
